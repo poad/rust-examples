@@ -1,0 +1,29 @@
+[package]
+name = "rust_mongodb"
+version = "0.1.0"
+authors = ["Kenji Saito <ken-yo@mbr.nifty.com>"]
+edition = "2018"
+
+[dependencies]
+iron = "0.6.*"
+router = "*"
+dotenv = "0.10"
+serde = "^1"
+serde_json = "^1"
+serde_derive = "^1"
+env_logger = "0.6.0"
+persistent = "0.4"
+#mongodb = { version = "0.3.11", features = ["ssl"] }
+mongodb = "0.3.11"
+bson = "0.13.0"
+log = "0.4"
+percent-encoding = "*"
+
+[dependencies.urlencoded]
+version = "*"
+
+[dependencies.bodyparser]
+git = "https://github.com/iron/body-parser.git"
+
+[dependencies.logger]
+git = "https://github.com/iron/logger.git"

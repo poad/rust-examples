@@ -1,0 +1,25 @@
+[package]
+name = "rust_iron_example"
+version = "0.1.0"
+authors = ["Kenji Saito <ken-yo@mbr.nifty.com>"]
+edition = "2018"
+
+[dependencies]
+iron = "0.6.*"
+router = "*"
+diesel = { version = "1.3.3", features = ["postgres"] }
+dotenv = "0.10"
+serde = "^1"
+serde_json = "^1"
+serde_derive = "^1"
+env_logger = "0.6.0"
+persistent = "0.4"
+
+[dependencies.urlencoded]
+version = "*"
+
+[dependencies.bodyparser]
+git = "https://github.com/iron/body-parser.git"
+
+[dependencies.logger]
+git = "https://github.com/iron/logger.git"

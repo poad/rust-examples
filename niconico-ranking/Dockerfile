@@ -1,10 +1,12 @@
-FROM rust AS builder
+FROM rust:slim AS builder
 
 RUN apt-get update -qq \
  && apt-get install -y -qq --no-install-recommends \
       build-essential \
       libxml2 \
- && apt-get clean
+      libssl-dev \
+      pkg-config \
+      openssl
 
 ADD Cargo.toml /root/Cargo.toml
 ADD Cargo.lock /root/Cargo.lock

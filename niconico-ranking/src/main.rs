@@ -62,7 +62,7 @@ struct KeywordsHandler;
 
 impl Handler for KeywordsHandler {
     fn handle(&self, _: &mut Request) -> IronResult<Response> {
-        let rss = parse_xml(get_niconico_ranking().to_owned());
+        let rss = parse_xml(get_niconico_ranking().unwrap().to_owned());
         let keywords = Keywords {
             items: rss.channel.items.iter().map(|item| item.title.to_owned()).collect::<Vec<String>>()
         };

@@ -5,9 +5,7 @@ authors = ["Kenji Saito <ken-yo@mbr.nifty.com>"]
 edition = "2018"
 
 [dependencies]
-iron = "0.6.*"
-iron-cors = "0.8.0"
-router = "*"
+actix-web = "0.7.*"
 reqwest = "0.9.15"
 log = "0.4"
 env_logger = "0.6.*"
@@ -21,6 +19,3 @@ version = "*"
 
 [dependencies.bodyparser]
 git = "https://github.com/iron/body-parser.git"
-
-[dependencies.logger]
-git = "https://github.com/iron/logger.git"

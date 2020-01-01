@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  mongo:
+    image: mongo:4
+    container_name: rust-mongodb-database
+    environment:
+      POSTGRES_PASSWORD: ""
+    ports:
+      - 27017:27017
+    networks:
+      - rust-iron-example-network
+  frontend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: rust-mongodb-frontend
+    environment:
+      RUST_LOG: info
+    ports:
+      - 3000:3000
+    links:
+      - mongo
+    networks:
+      - rust-iron-example-network
+networks:
+  rust-iron-example-network:
+  default:
+    external:
+      name: rust-iron-example-network

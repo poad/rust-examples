@@ -1,23 +1,21 @@
+extern crate bodyparser;
+extern crate diesel;
 #[macro_use]
 extern crate iron;
-extern crate bodyparser;
 extern crate persistent;
 extern crate router;
-extern crate urlencoded;
+extern crate rust_iron_example;
 #[macro_use]
 extern crate serde_derive;
-
-extern crate diesel;
-extern crate rust_iron_example;
+extern crate urlencoded;
 
 
-use persistent::Read;
+use iron::mime::*;
 use iron::prelude::*;
 use iron::status;
+use persistent::Read;
 use router::Router;
-use iron::mime::*;
 use urlencoded::UrlEncodedQuery;
-
 
 use self::rust_iron_example::*;
 
@@ -44,7 +42,7 @@ fn main() {
 
     router.delete("/:id", delete, "id");
 
-    Iron::new(router).http("localhost:3000").unwrap();
+    Iron::new(router).http("0.0.0.0:3000").unwrap();
 }
 
 fn get(req: &mut Request) -> IronResult<Response> {
@@ -139,14 +137,19 @@ fn delete(req: &mut Request) -> IronResult<Response> {
 
     let id = req.extensions.get::<Router>().unwrap().find("id");
 
-    let result = match id {
+    match id {
         None => {
             Ok(Response::with(status::BadRequest))
         }
         Some(id_value) => {
-            delete_post(&connection, id_value.parse::<i32>().expect("Invalid ID"));
-            Ok(Response::with(status::Ok))
+            match delete_post(&connection, id_value.parse::<i32>().expect("Invalid ID")) {
+                Ok(_) => Ok(Response::with(status::Ok)),
+                Err(err) => {
+                    println!("Error: {:?}", err);
+                    Ok(Response::with(status::BadRequest))
+                }
+            }
+
         }
-    };
-    result
+    }
 }

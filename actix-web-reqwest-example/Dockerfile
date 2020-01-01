@@ -6,7 +6,10 @@ RUN apt-get update -qq \
       libxml2 \
       libssl-dev \
       pkg-config \
-      openssl
+      openssl \
+      libpq-dev \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/log/apt/* /var/log/alternatives.log /var/log/dpkg.log /var/log/faillog /var/log/lastlog
 
 ADD Cargo.toml /root/Cargo.toml
 ADD Cargo.lock /root/Cargo.lock
@@ -18,8 +21,8 @@ RUN cargo build --release
 
 FROM rust:slim
 
-COPY --from=builder /root/target/release/niconico-ranking /root/niconico-ranking
+COPY --from=builder /root/target/release/actix-web-reqwest-example /root/actix-web-reqwest-example
 
 WORKDIR /root
 
-CMD ["/root/niconico-ranking"]
+CMD ["/root/actix-web-reqwest-example"]

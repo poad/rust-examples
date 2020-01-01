@@ -1,41 +1,34 @@
 pub mod github {
-    use actix_web::{HttpRequest, HttpResponse};
-    use actix_web::error::Error;
-    use futures::Future;
+    use actix_web::HttpRequest;
+    use std::env;
 
-    pub struct GitHub {
-    }
+    pub struct GitHub {}
 
     impl GitHub {
         pub fn new() -> Self {
             GitHub {}
         }
 
-        pub fn release_feed(
-            &self, _req: HttpRequest
-        ) -> Box<dyn Future<Item = HttpResponse, Error = Error>> {
-            Box::new(
-                reqwest::r#async::Client::new()
-                    .get("https://github.com/rust-lang/rust/releases.atom")
-                    .send()
-                    .map_err(|err| {
-                        log::error!("Get Activities ExternalServiceError: {}", err);
-                        Error::from(HttpResponse::InternalServerError().finish())
-                    })
-                    .and_then(|mut res| {
-                        res.text()
-                            .map_err(|err| {
-                                log::error!("Get Activities ExternalServiceError: {}", err);
-                                Error::from(HttpResponse::InternalServerError().finish())
-                            })
-                            .and_then(|r|
-                                HttpResponse::Ok()
-                                    .content_type("application/json")
-                                    .body(r)
-                            )
-                    })
-                    .and_then(|resp| futures::future::ok::<_, Error>(resp))
-            )
+        pub async fn release_feed(
+            &self, _req: HttpRequest,
+        ) -> Result<String, reqwest::Error> {
+            let proxy = match env::var("http_proxy") {
+                Ok(val) => Some(reqwest::Proxy::http(&val)),
+                Err(_) => match env::var("https_proxy") {
+                    Ok(val) => Some(reqwest::Proxy::https(&val)),
+                    Err(_) => None
+                }
+            };
+
+            let builder = proxy.map_or(reqwest::Client::builder(), |p| reqwest::Client::builder().proxy(p.unwrap()));
+            let client = builder.build().unwrap();
+
+            client
+                .get("https://github.com/rust-lang/rust/releases.atom")
+                .send()
+                .await?
+                .text()
+                .await
         }
     }
 }

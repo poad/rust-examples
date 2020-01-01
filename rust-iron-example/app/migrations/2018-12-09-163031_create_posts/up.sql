@@ -1,4 +1,6 @@
 -- Your SQL goes here
+\c diesel_demo
+
 CREATE TABLE posts (
   id SERIAL PRIMARY KEY,
   title VARCHAR NOT NULL,

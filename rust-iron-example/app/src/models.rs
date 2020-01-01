@@ -3,8 +3,6 @@ extern crate serde_json;
 
 use super::schema::posts;
 
-use serde_json::Error;
-
 #[derive(Queryable)]
 pub struct Post {
     pub id: i32,

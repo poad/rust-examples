@@ -15,5 +15,6 @@ env_logger = "*"
 rusoto_core = {version = "*", default_features = false, features=["rustls"]}
 rusoto_dynamodb = {version = "*", default_features = false, features=["rustls"]}
 actix-web = "*"
+actix-http = "*"
 actix-rt = "*"
-http-types = "*"
+async-trait = "*"

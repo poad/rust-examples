@@ -10,7 +10,7 @@ services:
       - "RUST_BACKTRACE=full"
       - "ENDPOINT=http://dynamodb:8000"
       - "AWS_ACCESS_KEY_ID=test"
-      - "AWS_SECRET_KEY=test"
+      - "AWS_SECRET_ACCESS_KEY=test"
       - "AWS_REGION=us-west-2"
       - "TABLE=test"
     volumes:

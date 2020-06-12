@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  front:
+    build:
+      context: .
+    container_name: rust-dynamodb-server
+    environment:
+      - "RUST_LOG=trace"
+      - "RUST_BACKTRACE=full"
+      - "ENDPOINT=http://dynamodb:8000"
+      - "AWS_ACCESS_KEY_ID=test"
+      - "AWS_SECRET_ACCESS_KEY=test"
+      - "AWS_REGION=us-west-2"
+      - "TABLE=test"
+    volumes:
+      - .:/home/rust/app
+    ports:
+      - 8080:8080
+    depends_on:
+      - dynamodb
+    networks:
+      - dynamodb-network
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    command: -jar DynamoDBLocal.jar -inMemory -sharedDb
+    container_name: dynamodb
+    volumes:
+      - "./dynamodb-data:/home/dynamodblocal/data"
+    ports:
+      - 8000:8000
+    networks:
+      - dynamodb-network
+
+networks:
+  dynamodb-network:

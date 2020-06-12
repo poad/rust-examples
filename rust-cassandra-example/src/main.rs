@@ -9,7 +9,7 @@ use cdrs::query::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
-pub struct Comment {
+struct Comment {
     id: Option<String>,
     name: String,
     message: String

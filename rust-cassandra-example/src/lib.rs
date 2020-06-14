@@ -24,6 +24,8 @@ pub mod cassandra {
         fn new(host: String) -> Client;
 
         fn create_keyspace(&self, name: String);
+        fn create_table(&self, name: String, scheme: String);
+        fn select(&self, query: String);
     }
 
     impl CassandraClient for Client {
@@ -45,6 +47,35 @@ pub mod cassandra {
                 "{ 'class' : 'SimpleStrategy', 'replication_factor' : 1 }"
             );
             session.query(create_ks).expect("Keyspace create error");
+        }
+
+        fn create_table(&self, name: String, scheme: String) {
+            let node = NodeTcpConfigBuilder::new(&self.host, NoneAuthenticator {}).build();
+            let cluster_config = ClusterTcpConfig(vec![node]);
+            let session =
+                new_session(&cluster_config, RoundRobin::new()).expect("session should be created");
+
+            let create_table = format!(
+                "CREATE COLUMNFAMILY {} {};",
+                name,
+                scheme
+            );
+            session.query(create_table).expect("Keyspace create error");
+        }
+
+        fn select(&self, query: String) {
+            let node = NodeTcpConfigBuilder::new(&self.host, NoneAuthenticator {}).build();
+            let cluster_config = ClusterTcpConfig(vec![node]);
+            let session =
+                new_session(&cluster_config, RoundRobin::new()).expect("session should be created");
+
+            match session.query(query) {
+                Ok(frame) => {
+                    println!("{}", String::from_utf8(frame.body).unwrap())
+                },
+                _ => unimplemented!()
+            }
+            unimplemented!()
         }
     }
 }

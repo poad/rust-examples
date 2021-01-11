@@ -5,24 +5,22 @@ authors = ["Kenji Saito <ken-yo@mbr.nifty.com>"]
 edition = "2018"
 
 [dependencies]
-iron = "*"
-router = "*"
+tide = "*"
+async-std = { version = "*", features = ["attributes"] }
 dotenv = "*"
-serde = "*"
+serde = { version = "*", features = ["derive"] }
 serde_json = "*"
 serde_derive = "*"
 env_logger = "*"
-persistent = "*"
-mongodb = "*"
 bson = "*"
 log = "*"
 percent-encoding = "*"
+futures = { version = "*", default-features = false }
+
+[dependencies.mongodb]
+version = "*"
+default-features = false
+features = ["async-std-runtime"]
 
 [dependencies.urlencoded]
 version = "*"
-
-[dependencies.bodyparser]
-git = "https://github.com/iron/body-parser.git"
-
-[dependencies.logger]
-git = "https://github.com/iron/logger.git"

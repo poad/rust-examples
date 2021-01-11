@@ -1,42 +1,26 @@
 use std::env;
 
-use cdrs::authenticators::NoneAuthenticator;
-use cdrs::cluster::{ClusterTcpConfig, NodeTcpConfigBuilder};
-use cdrs::cluster::session::{new as new_session};
-use cdrs::load_balancing::RoundRobin;
-use cdrs::query::*;
+use rust_cassandra_example::cassandra::{Client, CassandraClient};
+use tide::Request;
 
-use serde::{Deserialize, Serialize};
-
-#[derive(Deserialize, Serialize)]
-struct Comment {
-    id: Option<String>,
-    name: String,
-    message: String
-}
 
 #[async_std::main]
 async fn main() -> Result<(), std::io::Error> {
-    let host = format!("{}:{}", env::var("DATABASE_URL").expect("DATABASE_URL must be set"), 9042);
-    let node = NodeTcpConfigBuilder::new(&host, NoneAuthenticator {}).build();
-    let cluster_config = ClusterTcpConfig(vec![node]);
-    let session =
-        new_session(&cluster_config, RoundRobin::new()).expect("session should be created");
-
-    let create_ks: &'static str = "CREATE KEYSPACE IF NOT EXISTS test WITH REPLICATION = { \
-                                 'class' : 'SimpleStrategy', 'replication_factor' : 1 };";
-    session.query(create_ks).expect("Keyspace create error");
-
     let mut app = tide::new();
-    app.at("/").get( |_| async move {
-        let comment = Comment {
-            id: None,
-            name: "test".into(),
-            message: "Hello World!".into(),
-        };
 
-        return Ok(tide::Body::from_json(&comment)?)
-    });
-    app.listen("0.0.0.0:8080").await?;
+    app.at("/").get(index);
+
+    app.listen("0.0.0.0:8080").await.unwrap();
     Ok(())
+}
+
+async fn index(_: Request<()>) -> tide::Result {
+    let host = format!("{}:{}", env::var("DATABASE_URL").expect("DATABASE_URL must be set"), 9042);
+    let client = Client::new(host);
+    client.create_keyspace("test".parse().unwrap());
+    client.create_table("test.test".parse().unwrap(), "(id text PRIMARY KEY, name text, message text)".parse().unwrap());
+
+    client.select("SELECT * from test.test".parse().unwrap());
+
+    Ok("".into())
 }

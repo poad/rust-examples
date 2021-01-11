@@ -1,24 +1,13 @@
-extern crate bodyparser;
+extern crate env_logger;
 #[macro_use]
-extern crate iron;
-extern crate persistent;
-extern crate router;
-extern crate rust_mongodb;
-#[macro_use]
+extern crate log;
+extern crate percent_encoding;
 extern crate serde_derive;
 extern crate urlencoded;
-#[macro_use] extern crate log;
-extern crate env_logger;
-extern crate percent_encoding;
 
-use iron::mime::*;
-use iron::prelude::*;
-use iron::status;
-use persistent::Read;
-use router::Router;
-
-use self::rust_mongodb::*;
 use percent_encoding::percent_decode;
+use tide::{Request, Response, StatusCode};
+use tide::prelude::*;
 
 #[derive(Serialize, Deserialize)]
 struct Post {
@@ -26,162 +15,108 @@ struct Post {
     body: String,
 }
 
-const MAX_BODY_LENGTH: usize = 1024 * 1024 * 10;
-
-
-fn main() {
+#[async_std::main]
+async fn main() -> tide::Result<()> {
     env_logger::init();
 
-    let mut router = Router::new();                     // Alternative syntax:
-    router.get("/", get, "index");        // let router = router!(index: get "/" => handler,
-    router.get("/:title", get, "get");        //  query: get "/:query" => handler);
+    let mut app = tide::new();
+    app.at("/").get(index);
+    app.at("/{}").get(get);
+    app.at("/").post(create);
+    app.at("/").delete(delete);
 
-    let mut chain = Chain::new(post);
-    chain.link_before(Read::<bodyparser::MaxBodyLength>::one(MAX_BODY_LENGTH));
-
-    router.post("/", chain, "create");
-
-    let mut delete_chain = Chain::new(delete);
-    delete_chain.link_before(Read::<bodyparser::MaxBodyLength>::one(MAX_BODY_LENGTH));
-    router.delete("/", delete_chain, "delete");
-
-    Iron::new(router).http("0.0.0.0:3000").unwrap();
+    app.listen("0.0.0.0:3000").await?;
+    Ok(())
 }
 
-fn get(req: &mut Request) -> IronResult<Response> {
-    let client = connect_mongodb();
+async fn index(_: Request<()>) -> tide::Result {
+    let client = rust_mongodb::connect_mongodb();
 
-    let title = req.extensions.get::<Router>().unwrap().find("title");
-
-    let results = match title {
-        None => {
-            trace!("title is empty");
-            all_posts(client)
-                .iter()
-                .map(|doc| {
-                    let title_value = match doc.get_str("title") {
-                        Ok(title_value) => title_value,
-                        _ => panic!("")
-                    };
-                    let body_value = match doc.get_str("body") {
-                        Ok(body_value) => body_value,
-                        _ => panic!("")
-                    };
-                    Post {
-                        title: title_value.to_owned(),
-                        body: body_value.to_owned()
-                    }
-                }).collect()
-        },
-        Some(title_value) => {
-            let decoded = percent_decode(title_value.as_bytes()).decode_utf8().unwrap();
-
-            trace!("title is {}", decoded);
-
-            let post = get_post(&client, decoded.parse::<String>().expect("Invalid ID"));
-            match post {
-                Some(doc) => {
-                    let decoded = match doc.get_str("title") {
-                        Ok(decoded) => decoded,
-                        _ => panic!("")
-                    };
-                    let body_value = match doc.get_str("body") {
-                        Ok(body_value) => body_value,
-                        _ => panic!("")
-                    };
-                    vec!(Post {
-                        title: decoded.to_owned(),
-                        body: body_value.to_owned()
-                    })
-                },
-                None => {
-                    let vec: Vec<Post> = Vec::new();
-                    vec
-                }
+    let posts = rust_mongodb::all_posts(client).await;
+    let results: Vec<Post> = posts
+        .iter()
+        .map(|doc| {
+            let title_value = match doc.get_str("title") {
+                Ok(title_value) => title_value,
+                _ => panic!("")
+            };
+            let body_value = match doc.get_str("body") {
+                Ok(body_value) => body_value,
+                _ => panic!("")
+            };
+            Post {
+                title: title_value.to_owned(),
+                body: body_value.to_owned(),
             }
+        }).collect();
+
+    Ok(json!(results).into())
+}
+
+async fn get(mut req: Request<()>) -> tide::Result {
+    let client = rust_mongodb::connect_mongodb();
+
+    let body: Post = req.body_json().await?;
+
+    let decoded = percent_decode(body.title.as_bytes()).decode_utf8().unwrap();
+
+    trace!("title is {}", decoded);
+
+    let post = rust_mongodb::get_post(&client, decoded.parse::<String>().expect("Invalid ID")).await;
+
+    let results = match post {
+        Some(doc) => {
+            let decoded = match doc.get_str("title") {
+                Ok(decoded) => decoded,
+                _ => panic!("")
+            };
+            let body_value = match doc.get_str("body") {
+                Ok(body_value) => body_value,
+                _ => panic!("")
+            };
+            vec!(Post {
+                title: decoded.to_owned(),
+                body: body_value.to_owned(),
+            })
+        },
+        None => {
+            let vec: Vec<Post> = Vec::new();
+            vec
         }
     };
-    let response = itry!(serde_json::to_string(&results));
-    let content_type = "application/json".parse::<Mime>().unwrap();
 
-    Ok(Response::with((content_type, status::Ok, response)))
+    Ok(json!(results).into())
 }
 
-fn post(req: &mut Request) -> IronResult<Response> {
-    let client = connect_mongodb();
+async fn create(mut req: Request<()>) -> tide::Result {
+    let client = rust_mongodb::connect_mongodb();
 
-    let json_body = req.get::<bodyparser::Json>();
-    match json_body {
-        Ok(Some(json_body)) => {
-            match json_body.as_object() {
-                Some(post) => {
-                    let title = match post.get("title") {
-                        Some(value) => match value.as_str() {
-                            Some(v) => v,
-                            None => ""
-                        },
-                        None => ""
-                    };
-                    let body = match post.get("body") {
-                        Some(value) => match value.as_str() {
-                            Some(v) => v,
-                            None => ""
-                        },
-                        None => ""
-                    };
+    let post: Post = req.body_json().await?;
+    let title = post.title;
+    let body = post.body;
 
-                    let _post = create_post(&client, title, body);
-                    let res_post = Post {
-                        title: title.to_owned(),
-                        body: body.to_owned(),
-                    };
-                    let response = itry!(serde_json::to_string(&res_post));
-                    let content_type = "application/json".parse::<Mime>().unwrap();
+    rust_mongodb::create_post(&client, &title, &body).await;
 
-                    Ok(Response::with((content_type, status::Ok, response)))
-                }
-                None => Ok(Response::with(status::BadRequest))
-            }
-        }
-        Ok(None) => Ok(Response::with(status::BadRequest)),
-        Err(err) => {
-            println!("Error: {:?}", err);
-            Ok(Response::with(status::BadRequest))
-        }
-    }
+    Ok(json!(Post { title: title.to_owned(), body: body.to_owned(), }).into())
 }
 
-fn delete(req: &mut Request) -> IronResult<Response> {
-    let client = connect_mongodb();
+async fn delete(mut req: Request<()>) -> tide::Result {
+    let client = rust_mongodb::connect_mongodb();
 
-    let json_body = req.get::<bodyparser::Json>();
+    let json_body: tide::Result<Post> = req.body_json().await;
     match json_body {
-        Ok(Some(json_body)) => {
-            match json_body.as_object() {
-                Some(post) => {
-                    let title = match post.get("title") {
-                        Some(value) => match value.as_str() {
-                            Some(v) => v,
-                            None => ""
-                        },
-                        None => ""
-                    };
-
-                    match delete_post(&client, title.parse::<String>().expect("Invalid ID")) {
-                        Ok(_) => Ok(Response::with(status::Ok)),
-                        Err(err) => {
-                            println!("Error: {:?}", err);
-                            Ok(Response::with(status::BadRequest))
-                        }
-                    }
+        Ok(post) => {
+            match rust_mongodb::delete_post(&client, post.title.parse::<String>().expect("Invalid ID")).await {
+                Ok(_) => Ok(Response::new(StatusCode::Ok)),
+                Err(err) => {
+                    println!("Error: {:?}", err);
+                    Ok(Response::new(StatusCode::BadRequest))
                 }
-                None => Ok(Response::with(status::BadRequest))
             }
         }
-        Ok(None) => Ok(Response::with(status::BadRequest)),
         Err(err) => {
             println!("Error: {:?}", err);
-            Ok(Response::with(status::BadRequest))
+            Ok(Response::new(StatusCode::BadRequest))
         }
     }
 }

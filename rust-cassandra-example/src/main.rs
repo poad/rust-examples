@@ -28,14 +28,14 @@ async fn main() -> Result<(), std::io::Error> {
     session.query(create_ks).expect("Keyspace create error");
 
     let mut app = tide::new();
-    app.at("/").get( |req| async move {
+    app.at("/").get( |_| async move {
         let comment = Comment {
             id: None,
             name: "test".into(),
             message: "Hello World!".into(),
         };
 
-        return Ok(tide::Response::new(tide::StatusCode::Ok).body_json(&comment)?)
+        return Ok(tide::Body::from_json(&comment)?)
     });
     app.listen("0.0.0.0:8080").await?;
     Ok(())

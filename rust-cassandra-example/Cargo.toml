@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 cdrs = "*"
 tide = "*"
-http-types = "2.0.1"
+http-types = "*"
 async-std = { version = "*", features = ["attributes"] }
 env_logger = "*"
 serde = "*"

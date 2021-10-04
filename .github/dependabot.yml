@@ -1,0 +1,62 @@
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: '/actix-web-reqwest-example/'
+    schedule:
+      interval: daily
+      timezone: Asia/Tokyo
+    allow:
+      - dependency-type: all
+    rebase-strategy: auto
+    assignees:
+      - poad
+  - package-ecosystem: cargo
+    directory: '/rust-cassandra-example/'
+    schedule:
+      interval: daily
+      timezone: Asia/Tokyo
+    allow:
+      - dependency-type: all
+    rebase-strategy: auto
+    assignees:
+      - poad
+  - package-ecosystem: cargo
+    directory: '/rust-dynamodb-example/'
+    schedule:
+      interval: daily
+      timezone: Asia/Tokyo
+    allow:
+      - dependency-type: all
+    rebase-strategy: auto
+    assignees:
+      - poad
+  - package-ecosystem: cargo
+    directory: '/rust-fizzbuzz/'
+    schedule:
+      interval: daily
+      timezone: Asia/Tokyo
+    allow:
+      - dependency-type: all
+    rebase-strategy: auto
+    assignees:
+      - poad
+  - package-ecosystem: cargo
+    directory: '/rust-iron-example/'
+    schedule:
+      interval: daily
+      timezone: Asia/Tokyo
+    allow:
+      - dependency-type: all
+    rebase-strategy: auto
+    assignees:
+      - poad
+  - package-ecosystem: cargo
+    directory: '/rust-mongodb/'
+    schedule:
+      interval: daily
+      timezone: Asia/Tokyo
+    allow:
+      - dependency-type: all
+    rebase-strategy: auto
+    assignees:
+      - poad

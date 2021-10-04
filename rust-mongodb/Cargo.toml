@@ -12,13 +12,12 @@ serde = { version = "*", features = ["derive"] }
 serde_json = "*"
 serde_derive = "*"
 env_logger = "*"
-bson = "*"
 log = "*"
 percent-encoding = "*"
 futures = { version = "*", default-features = false }
 
 [dependencies.mongodb]
-version = "*"
+version = "1.1.1"
 default-features = false
 features = ["async-std-runtime"]
 

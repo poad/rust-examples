@@ -2,12 +2,12 @@ use futures::stream::StreamExt;
 use mongodb::bson::{doc, Document};
 use mongodb::error::Result;
 use mongodb::results::{DeleteResult, InsertOneResult};
-use mongodb::{options::{ClientOptions, StreamAddress}, Client, Cursor};
+use mongodb::{options::{ClientOptions, ServerAddress}, Client, Cursor};
 
 pub fn connect_mongodb() -> Client {
     let options = ClientOptions::builder()
-        .hosts(vec![StreamAddress {
-            hostname: "mongo".into(),
+        .hosts(vec![ServerAddress::Tcp {
+            host: "mongo".into(),
             port: Some(27017),
         }])
         .build();
@@ -23,7 +23,7 @@ pub async fn create_post(client: &Client, title: &str, body: &str) -> InsertOneR
 }
 
 pub async fn all_posts(client: Client) -> Vec<Document> {
-    let cursor: Cursor = client
+    let cursor: Cursor<Document> = client
         .database("posts")
         .collection("post")
         .find(None, None)
@@ -49,7 +49,7 @@ pub async fn get_post(client: &Client, title: String) -> Option<Document> {
 }
 
 pub async fn delete_post(client: &Client, title: String) -> Result<DeleteResult> {
-    let coll = client.database("posts").collection("post");
+    let coll = client.database("posts").collection::<Document>("post");
     return coll
         .delete_one(doc! {"title": title}, None)
         .await;

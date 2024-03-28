@@ -9,6 +9,10 @@ updates:
     rebase-strategy: auto
     assignees:
       - poad
+    groups:
+      actions:
+        patterns:
+          - '*'
 
   - package-ecosystem: cargo
     directory: '/actix-web-reqwest-example/'
@@ -20,6 +24,11 @@ updates:
     rebase-strategy: auto
     assignees:
       - poad
+    groups:
+      actix-web-reqwest:
+        patterns:
+          - '*'
+
   - package-ecosystem: cargo
     directory: '/rust-cassandra-example/'
     schedule:
@@ -30,6 +39,11 @@ updates:
     rebase-strategy: auto
     assignees:
       - poad
+    groups:
+      cassandra:
+        patterns:
+          - '*'
+
   - package-ecosystem: cargo
     directory: '/rust-dynamodb-example/'
     schedule:
@@ -40,6 +54,11 @@ updates:
     rebase-strategy: auto
     assignees:
       - poad
+    groups:
+      dynamodb:
+        patterns:
+          - '*'
+
   - package-ecosystem: cargo
     directory: '/rust-fizzbuzz/'
     schedule:
@@ -50,8 +69,13 @@ updates:
     rebase-strategy: auto
     assignees:
       - poad
+    groups:
+      fizzbuzz:
+        patterns:
+          - '*'
+
   - package-ecosystem: cargo
-    directory: '/rust-iron-example/'
+    directory: '/rust-iron-example/app/'
     schedule:
       interval: daily
       timezone: Asia/Tokyo
@@ -60,6 +84,11 @@ updates:
     rebase-strategy: auto
     assignees:
       - poad
+    groups:
+      iron:
+        patterns:
+          - '*'
+
   - package-ecosystem: cargo
     directory: '/rust-mongodb/'
     schedule:
@@ -70,3 +99,7 @@ updates:
     rebase-strategy: auto
     assignees:
       - poad
+    groups:
+      mongodb:
+        patterns:
+          - '*'

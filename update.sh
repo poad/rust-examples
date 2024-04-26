@@ -13,7 +13,7 @@ if [ $result -ne 0 ]; then
   exit $result
 fi
 
-set -- "actix-web-reqwest-example"  "axum-example"  "rust-dynamodb-example"  "rust-fizzbuzz"  "rust-iron-example/app"  "rust-mongodb"
+set -- "actix-web-reqwest-example"  "rust-dynamodb-example"  "rust-fizzbuzz"  "rust-iron-example/app"  "rust-mongodb"
 for target in "$@"; do
   cd "${CURRENT}/${target}" || exit
   result=$?

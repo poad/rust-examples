@@ -19,11 +19,10 @@ jobs:
           - rust-cassandra-example
           - rust-dynamodb-example
           - rust-fizzbuzz
-          - rust-iron-example/app
           - rust-mongodb
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Build
       run: |
         cd ${{ matrix.path }}

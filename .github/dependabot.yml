@@ -75,21 +75,6 @@ updates:
           - '*'
 
   - package-ecosystem: cargo
-    directory: '/rust-iron-example/app/'
-    schedule:
-      interval: daily
-      timezone: Asia/Tokyo
-    allow:
-      - dependency-type: all
-    rebase-strategy: auto
-    assignees:
-      - poad
-    groups:
-      iron:
-        patterns:
-          - '*'
-
-  - package-ecosystem: cargo
     directory: '/rust-mongodb/'
     schedule:
       interval: daily

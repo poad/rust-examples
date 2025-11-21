@@ -22,7 +22,7 @@ jobs:
           - rust-mongodb
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Build
       run: |
         cd ${{ matrix.path }}

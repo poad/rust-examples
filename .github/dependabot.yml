@@ -7,6 +7,8 @@ updates:
     allow:
       - dependency-type: all
     rebase-strategy: auto
+    cooldown:
+      default-days: 3
     assignees:
       - poad
     groups:
@@ -15,76 +17,23 @@ updates:
           - '*'
 
   - package-ecosystem: cargo
-    directory: '/actix-web-reqwest-example/'
+    directories: 
+      - '/actix-web-reqwest-example/'
+      - '/rust-cassandra-example/'
+      - '/rust-dynamodb-example/'
+      - '/rust-fizzbuzz/'
+      - '/rust-mongodb/'
     schedule:
       interval: daily
       timezone: Asia/Tokyo
     allow:
       - dependency-type: all
+    cooldown:
+      default-days: 7
     rebase-strategy: auto
     assignees:
       - poad
     groups:
-      actix-web-reqwest:
-        patterns:
-          - '*'
-
-  - package-ecosystem: cargo
-    directory: '/rust-cassandra-example/'
-    schedule:
-      interval: daily
-      timezone: Asia/Tokyo
-    allow:
-      - dependency-type: all
-    rebase-strategy: auto
-    assignees:
-      - poad
-    groups:
-      cassandra:
-        patterns:
-          - '*'
-
-  - package-ecosystem: cargo
-    directory: '/rust-dynamodb-example/'
-    schedule:
-      interval: daily
-      timezone: Asia/Tokyo
-    allow:
-      - dependency-type: all
-    rebase-strategy: auto
-    assignees:
-      - poad
-    groups:
-      dynamodb:
-        patterns:
-          - '*'
-
-  - package-ecosystem: cargo
-    directory: '/rust-fizzbuzz/'
-    schedule:
-      interval: daily
-      timezone: Asia/Tokyo
-    allow:
-      - dependency-type: all
-    rebase-strategy: auto
-    assignees:
-      - poad
-    groups:
-      fizzbuzz:
-        patterns:
-          - '*'
-
-  - package-ecosystem: cargo
-    directory: '/rust-mongodb/'
-    schedule:
-      interval: daily
-      timezone: Asia/Tokyo
-    allow:
-      - dependency-type: all
-    rebase-strategy: auto
-    assignees:
-      - poad
-    groups:
-      mongodb:
+      cargo:
         patterns:
           - '*'

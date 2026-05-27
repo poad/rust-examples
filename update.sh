@@ -6,42 +6,30 @@ CURRENT=$(cd "$(dirname "$0")" || exit;pwd)
 echo "${CURRENT}"
 
 cd "${CURRENT}" || exit
-git pull --prune
-result=$?
-if [ $result -ne 0 ]; then
+
+if ! (git pull --prune); then
   cd "${CUR}" || exit
-  exit $result
+  exit 1
+fi
+
+if ! (disable-checkout-persist-credentials); then
+  cd "${CUR}" || exit
+  exit 1
 fi
 
 set -- "actix-web-reqwest-example"  "rust-dynamodb-example"  "rust-fizzbuzz"  "rust-mongodb"
 for target in "$@"; do
-  cd "${CURRENT}/${target}" || exit
-  result=$?
-  if [ $result -ne 0 ]; then
+  if ! (cd "${CURRENT}/${target}" || exit && cargo update); then
     cd "${CUR}" || exit
-    exit $result
+    exit 1
   fi
   echo ""
   pwd
-  cargo update
-  result=$?
-  if [ $result -ne 0 ]; then
-    cd "${CUR}" || exit
-    exit $result
-  fi
 done
 
-cd "${CURRENT}" || exit
-result=$?
-if [ $result -ne 0 ]; then
+if ! (cd "${CURRENT}" || exit && git add . && git commit -am "Bumps crates" && git push); then
   cd "${CUR}" || exit
-  exit $result
-fi
-git add . && git commit -am "Bumps crates" && git push
-result=$?
-if [ $result -ne 0 ]; then
-  cd "${CUR}" || exit
-  exit $result
+  exit 1
 fi
 
 cd "${CUR}" || exit

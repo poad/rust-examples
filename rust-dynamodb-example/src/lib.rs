@@ -132,7 +132,7 @@ pub mod dynamodb {
                 },
                 Err(error) => {
                     error!("{:?}", error);
-                    panic!(error)
+                    panic!("{}", error)
                 }
             }
         }
@@ -154,8 +154,6 @@ pub mod dynamodb {
                 ..Default::default()
             });
 
-
-
             let create_serials = PutItemInput {
                 item,
                 table_name: String::from(table),
@@ -168,7 +166,7 @@ pub mod dynamodb {
                 },
                 Err(error) => {
                     error!("{:?}", error);
-                    panic!(error)
+                    panic!("{}", error)
                 },
             }
         }
@@ -215,7 +213,7 @@ pub mod dynamodb {
                 },
                 Err(error) => {
                     error!("{:?}", error);
-                    panic!(error)
+                    panic!("{}", error)
                 },
             }
         }
@@ -280,7 +278,7 @@ pub mod dynamodb {
                 },
                 Err(error) => {
                     error!("{:?}", error);
-                    panic!(error)
+                    panic!("{}", error)
                 },
             }
         }

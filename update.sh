@@ -19,7 +19,7 @@ fi
 
 set -- "actix-web-reqwest-example"  "rust-dynamodb-example"  "rust-fizzbuzz"  "rust-mongodb"
 for target in "$@"; do
-  if ! (cd "${CURRENT}/${target}" || exit && cargo update); then
+  if ! (cd "${CURRENT}/${target}" || exit && cargo update && cargo build); then
     cd "${CUR}" || exit
     exit 1
   fi

@@ -2,7 +2,7 @@ use futures::stream::StreamExt;
 use mongodb::bson::{doc, Document};
 use mongodb::error::Result;
 use mongodb::results::{DeleteResult, InsertOneResult};
-use mongodb::{options::{ClientOptions, ServerAddress}, Client, Cursor};
+use mongodb::{options::{ClientOptions, ServerAddress}, Client};
 
 pub fn connect_mongodb() -> Client {
     let options = ClientOptions::builder()
@@ -17,16 +17,16 @@ pub fn connect_mongodb() -> Client {
 
 pub async fn create_post(client: &Client, title: &str, body: &str) -> InsertOneResult {
     let coll = client.database("posts").collection("post");
-    coll.insert_one( doc! { "title": title, "body": body }, None)
+    coll.insert_one( doc! { "title": title, "body": body })
         .await
         .unwrap()
 }
 
 pub async fn all_posts(client: Client) -> Vec<Document> {
-    let cursor: Cursor<Document> = client
+    let cursor = client
         .database("posts")
         .collection("post")
-        .find(None, None)
+        .find(doc! {})
         .await
         .unwrap();
 
@@ -41,7 +41,7 @@ pub async fn all_posts(client: Client) -> Vec<Document> {
 
 pub async fn get_post(client: &Client, title: String) -> Option<Document> {
     let coll = client.database("posts").collection("post");
-    let result =  match coll.find_one(Some( doc! {"title": title}), None).await {
+    let result =  match coll.find_one(doc! {"title": title}).await {
         Ok(item) => item,
         _ => None,
     };
@@ -51,6 +51,6 @@ pub async fn get_post(client: &Client, title: String) -> Option<Document> {
 pub async fn delete_post(client: &Client, title: String) -> Result<DeleteResult> {
     let coll = client.database("posts").collection::<Document>("post");
     return coll
-        .delete_one(doc! {"title": title}, None)
+        .delete_one(doc! {"title": title})
         .await;
 }

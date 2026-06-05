@@ -2,7 +2,7 @@
 name = "rust_mongodb"
 version = "0.1.0"
 authors = ["Kenji Saito <ken-yo@mbr.nifty.com>"]
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 tide = "*"
@@ -15,6 +15,7 @@ env_logger = "*"
 log = "*"
 percent-encoding = "*"
 futures = { version = "*", default-features = false }
+mongodb = "*"
 
 [dependencies.urlencoded]
 version = "*"
